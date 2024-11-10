@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-10">
+  <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg p-6">
+    <h2 class="text-2xl font-bold mb-4 text-center">To-Do List</h2>
+    <div class="flex mb-4">
+      <input id="task-input" type="text" class="w-full px-4 py-2 border rounded-l-lg" placeholder="Add a new task">
+      <button onclick="addTask()" class="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600">Add</button>
+    </div>
+    <ul id="task-list" class="space-y-3"></ul>
+  </div>
+
+ <script>
+  let tasks = [];
+
+function addTask() {
+  const taskInput = document.getElementById('task-input');
+  const taskText = taskInput.value.trim();
+  if (taskText === '') return;
+  tasks.push({ text: taskText, completed: false });
+  console.log(tasks)
+  taskInput.value = '';
+  renderTasks();
+}
+
+function renderTasks() {
+  const taskList = document.getElementById('task-list');
+  taskList.innerHTML = '';
+  tasks.forEach((task, index) => {
+    const taskItem = document.createElement('li');
+    taskItem.className = `flex items-center justify-between p-2 border rounded ${task.completed ? 'bg-green-100' : ''}`;
+
+    // Task text with a completion toggle
+    const taskText = document.createElement('span');
+    taskText.className = `flex-1 ${task.completed ? 'line-through text-gray-500' : ''}`;
+    taskText.textContent = task.text;
+    taskText.onclick = () => toggleComplete(index);
+
+    // Edit, Copy, and Delete buttons
+    const actions = document.createElement('div');
+    actions.className = 'space-x-2';
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600';
+    editBtn.textContent = 'Edit';
+    editBtn.onclick = () => editTask(index);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600';
+    copyBtn.textContent = 'Copy';
+    copyBtn.onclick = () => copyTask(task.text);
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600';
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.onclick = () => deleteTask(index);
+
+    actions.appendChild(editBtn);
+    actions.appendChild(copyBtn);
+    actions.appendChild(deleteBtn);
+    
+    taskItem.appendChild(taskText);
+    taskItem.appendChild(actions);
+    taskList.appendChild(taskItem);
+  });
+}
+
+function toggleComplete(index) {
+  tasks[index].completed = !tasks[index].completed;
+  renderTasks();
+}
+
+function editTask(index) {
+  const newTask = prompt('Edit your task:', tasks[index].text);
+  if (newTask !== null && newTask.trim() !== '') {
+    tasks[index].text = newTask.trim();
+    renderTasks();
+  }
+}
+
+function copyTask(taskText) {
+  navigator.clipboard.writeText(taskText).then(() => alert('Task copied to clipboard'));
+}
+
+function deleteTask(index) {
+  tasks.splice(index, 1);
+  renderTasks();
+}
+ </script>
+</body>
+</html>
